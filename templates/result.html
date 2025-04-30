@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Prediction Result</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/result.css') }}"
+    />
+  </head>
+  <body class="with-background">
+    <div class="container">
+      <!-- Result Box 1 -->
+      <div class="result-box">
+        <div class="result-content">
+          <h2>Prediction Result</h2>
+          <p class="verdict">{{ prediction_text }}</p>
+          <a href="{{ url_for('home') }}">
+            <button class="check-button">Check Another Transaction</button>
+          </a>
+        </div>
+      </div>
+
+      <!-- Result Box 2 -->
+      <div class="result-box">
+        <div class="classification-heading">Classification Report</div>
+        <img
+          src="{{ url_for('static', filename='images/classification.png') }}"
+          alt="Classification Report"
+          class="classification-img"
+        />
+        <div class="progress-container-inline">
+          <svg class="progress-circle" width="70" height="70">
+            <circle
+              cx="35"
+              cy="35"
+              r="30"
+              stroke="#ddd"
+              stroke-width="8"
+              fill="none"
+            />
+            <circle
+              id="progress-bar"
+              cx="35"
+              cy="35"
+              r="30"
+              stroke="#00bfff"
+              stroke-width="8"
+              fill="none"
+              stroke-linecap="round"
+              stroke-dasharray="188"
+              stroke-dashoffset="188"
+            />
+            <text
+              id="progress-text"
+              x="35"
+              y="40"
+              text-anchor="middle"
+              fill="white"
+              font-size="14"
+              font-weight="bold"
+            >
+              0%
+            </text>
+          </svg>
+          <span class="accuracy-label-inline">Model Accuracy</span>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const accuracy = 93; // Replace with actual accuracy if passing from Flask dynamically
+      const progressBar = document.getElementById("progress-bar");
+      const progressText = document.getElementById("progress-text");
+
+      const radius = 30; // Radius of the circle
+      const circumference = 2 * Math.PI * radius;
+      const targetOffset = circumference - (accuracy / 100) * circumference;
+
+      // Animation for the progress circle
+      let currentOffset = circumference;
+      let currentValue = 0;
+      const duration = 2; // Animation duration in seconds
+
+      function animateProgress() {
+        const startTime = performance.now();
+
+        function updateProgress(now) {
+          const elapsedTime = (now - startTime) / 1000; // Elapsed time in seconds
+          const progress = Math.min(elapsedTime / duration, 1); // Progress percentage
+
+          currentOffset =
+            circumference - (accuracy / 100) * circumference * progress;
+          progressBar.style.strokeDashoffset = currentOffset;
+
+          currentValue = Math.floor(progress * accuracy);
+          progressText.textContent = `${currentValue}%`;
+
+          if (progress < 1) {
+            requestAnimationFrame(updateProgress); // Continue the animation
+          }
+        }
+
+        requestAnimationFrame(updateProgress);
+      }
+
+      animateProgress(); // Start the animation when the page loads
+    </script>
+  </body>
+</html>
